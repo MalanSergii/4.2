@@ -14,6 +14,20 @@ class App extends Component {
     ],
     filter: '',
   };
+  componentDidMount = () => {
+    const savedContacts = localStorage.getItem('contacts');
+    if (savedContacts) {
+      this.setState({
+        contacts: JSON.parse(savedContacts),
+      });
+    }
+  };
+
+  componentDidUpdate(_, prevState) {
+    if (prevState.contacts !== this.state.contacts) {
+      localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
+    }
+  }
 
   onFilterChange = e => {
     this.setState({
@@ -22,9 +36,7 @@ class App extends Component {
   };
 
   createContact = data => {
-    const exist = [...this.state.contacts].some(
-      item => item.name === data.name
-    );
+    const exist = [...this.state.contacts].some(item => item.name === data.name);
     if (!exist) {
       this.setState(prev => ({
         contacts: [...prev.contacts, { id: nanoid(), ...data }],
@@ -52,14 +64,8 @@ class App extends Component {
         <ContactsForm getData={this.createContact}></ContactsForm>
 
         <h2>Contacts</h2>
-        <Filter
-          onFilterChange={this.onFilterChange}
-          filter={this.state.filter}
-        ></Filter>
-        <ContactList
-          filtered={filtered}
-          removeContact={this.removeContact}
-        ></ContactList>
+        <Filter onFilterChange={this.onFilterChange} filter={this.state.filter}></Filter>
+        <ContactList filtered={filtered} removeContact={this.removeContact} />
       </>
     );
   }
